@@ -14,11 +14,29 @@ import { AppComponent } from './app.component';
 import "hammerjs";
 import { MenuComponent } from './menu/menu.component';
 import { DishtailComponent } from './dishtail/dishtail.component';
+
+
+import { DishService } from './services/dish.service';
+import { PromotionService } from './services/promotion.service';
+import { LeaderService } from "./services/leader.service";
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
+import { AboutComponent } from './about/about.component';
+import { HomeComponent } from './home/home.component';
+import { ContactComponent } from './contact/contact.component';
+
+//import { AppRoutingModule } from './app-routing/app-routing.module';
+
 @NgModule({
   declarations: [
     AppComponent,
     MenuComponent,
-    DishtailComponent
+    DishtailComponent,
+    HeaderComponent,
+    FooterComponent,
+    AboutComponent,
+    HomeComponent,
+    ContactComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +49,8 @@ import { DishtailComponent } from './dishtail/dishtail.component';
     MatCardModule,
     MatButtonModule
   ],
-  providers: [],
+  providers: [DishService,
+              PromotionService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

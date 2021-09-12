@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { Dish } from '../shared/dish';
+import { DishService } from '../services/dish.service';
+import { Params, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 const DISH = {
   id: '0',
@@ -49,13 +53,22 @@ const DISH = {
   styleUrls: ['./dishtail.component.scss']
 })
 export class DishtailComponent implements OnInit {
+  
+    dish!: Dish;
+  
 
 
-  dish = DISH;
-
-  constructor() { }
+  constructor(private dishservice: DishService,
+    private route: ActivatedRoute,
+    private location: Location) { }
 
   ngOnInit(): void {
+    const id = this.route.snapshot.params['id'];
+    this.dish = this.dishservice.getDish(id);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
 }
