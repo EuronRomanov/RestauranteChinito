@@ -1,9 +1,9 @@
 export class Leader {
-    id!:String;
-      name!: String;
-      image!: String;
-      designation!: String;
-      abbr!: String;
+    id!:string;
+      name!: string;
+      image!: string;
+      designation!: string;
+      abbr!: string;
       featured!: boolean;
-     description!: String;
+     description!: string;
 }
