@@ -38,6 +38,7 @@ import { ContactComponent } from './contact/contact.component';
 import { LoginComponent } from './login/login.component';
 
 import { baseURL } from './shared/baseurl';
+import { HighlightDirective } from './directives/highlight.directive';
 
 //import { AppRoutingModule } from './app-routing/app-routing.module';
 
@@ -51,7 +52,8 @@ import { baseURL } from './shared/baseurl';
     AboutComponent,
     HomeComponent,
     ContactComponent,
-    LoginComponent
+    LoginComponent,
+    HighlightDirective
   ],
   imports: [
     BrowserModule,
@@ -78,7 +80,8 @@ import { baseURL } from './shared/baseurl';
   providers: [DishService,
               PromotionService,
             LeaderService,
-            {provide: 'BaseURL', useValue: baseURL}],
+            {provide: 'BaseURL', useValue: baseURL}
+          ],
   entryComponents: [
               LoginComponent
         ],

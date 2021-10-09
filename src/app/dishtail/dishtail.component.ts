@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild  } from '@angular/core';
+import { Component, OnInit, ViewChild,Inject } from '@angular/core';
 import { Dish } from '../shared/dish';
 import { DishService } from '../services/dish.service';
 import { Params, ActivatedRoute } from '@angular/router';
@@ -6,19 +6,21 @@ import { Location } from '@angular/common';
 import { switchMap } from 'rxjs/operators';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Comment } from "../shared/comment";
-
-
+import { visibility } from '../animations/app.animation';
 
 
 @Component({
   selector: 'app-dishtail',
   templateUrl: './dishtail.component.html',
-  styleUrls: ['./dishtail.component.scss']
+  styleUrls: ['./dishtail.component.scss'],
+  animations: [
+    visibility()
+  ]
 })
 export class DishtailComponent implements OnInit {
   
-    dish!: Dish;
-    dishIds!: string[];
+    dish?: any |null;
+    dishIds: string[]=new Array();
     prev!: string;
     next!: string;
     
@@ -29,6 +31,11 @@ export class DishtailComponent implements OnInit {
     
     @ViewChild('fform') commentFormDirective:any;
   
+    errMess!: string;
+  
+    dishcopy!:any | null;
+
+    visibility = 'shown';
 
     formErrors:any={
       'author':'',
@@ -46,13 +53,19 @@ export class DishtailComponent implements OnInit {
         },
       };
 
+      
 
   constructor(private dishservice: DishService,
     private route: ActivatedRoute,
     private location: Location,
-    private fb:FormBuilder) {
+    private fb:FormBuilder,
+    @Inject('BaseURL') public BaseURL:any) {
       this.createForm();
-      
+      this.route.params.pipe(switchMap((params:Params)=>this.dishservice.getDish(params['id'])))
+      .subscribe(dish=>{this.dish=dish; this.dishcopy=dish; this.setPrevNext(dish.id);},
+      errmess=>this.errMess=<any>errmess);
+      this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds,
+        errmess => this.errMess = <any>errmess);
      }
 
 
@@ -61,9 +74,13 @@ export class DishtailComponent implements OnInit {
       return 5;
     }
   ngOnInit(): void {
-    this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
-    this.route.params.pipe(switchMap((params: Params) => this.dishservice.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.comments=dish.comments; this.setPrevNext(dish.id); });
+    this.dishservice.getDishIds().subscribe(dishIds => this.dishIds = dishIds,
+      errmess => this.errMess = <any>errmess);
+      this.route.params
+      .pipe(switchMap((params: Params) => { this.visibility = 'hidden'; return this.dishservice.getDish(+params['id']); }))
+      .subscribe(dish => { this.dish = dish; this.dishcopy = dish; this.setPrevNext(dish.id); this.visibility = 'shown'; },
+        errmess => this.errMess = <any>errmess);
+    
   }
 
   goBack(): void {
@@ -72,6 +89,7 @@ export class DishtailComponent implements OnInit {
 
   setPrevNext(dishId: string) {
     const index = this.dishIds.indexOf(dishId);
+   //console.log(this.dishIds+'' +dishId+'' +this.dishIds.indexOf(dishId) +"\n");
     this.prev = this.dishIds[(this.dishIds.length + index - 1) % this.dishIds.length];
     this.next = this.dishIds[(this.dishIds.length + index + 1) % this.dishIds.length];
   }
@@ -103,7 +121,12 @@ export class DishtailComponent implements OnInit {
       author: '',
       date: new Date().toISOString()
     });
-
+    this.dishcopy.comments.push(this.comment);
+    this.dishservice.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; this.dishcopy = dish;
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });
    
   }
 

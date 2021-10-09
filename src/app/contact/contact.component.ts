@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Feedback, ContactType } from "../shared/feedback";
+import { FeedbackService } from "../services/feedback.service";
 
 @Component({
   selector: 'app-contact',
@@ -15,6 +16,10 @@ export class ContactComponent implements OnInit {
   feedback!: Feedback;
   contactType=ContactType;
  
+
+   feedbacks!:Feedback[];
+   feedbackResponse!:Feedback;
+   isSaving = false;
   formErrors:any = {
     'firstname': '',
     'lastname': '',
@@ -45,7 +50,8 @@ export class ContactComponent implements OnInit {
 
   
 
-  constructor(private fb:FormBuilder) { 
+  constructor(private fb:FormBuilder,
+    private feedbackService:FeedbackService) { 
     this.createForm();
     this.feedbackForm = this.fb.group({
       firstname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(25)] ],
@@ -56,6 +62,7 @@ export class ContactComponent implements OnInit {
       contacttype: 'None',
       message: ''
     });
+    this.feedbackService.getFeedbacks().subscribe(feedbacks=>this.feedbacks=feedbacks);
   }
 
   ngOnInit(): void {
@@ -79,7 +86,9 @@ export class ContactComponent implements OnInit {
 
   onSubmit(){
     this.feedback=this.feedbackForm.value;
-    console.log(this.feedback);
+   // console.log(this.feedback);
+   this.feedbackService.postFeedback(this.feedback).subscribe((feedback)=>this.feedbackResponse=feedback);
+   this.isSaving=true;
     this.feedbackForm.reset();
   }
 
@@ -102,7 +111,12 @@ export class ContactComponent implements OnInit {
       }
     }
   }
-
+  
+  mostraResultado(){
+    
+      
+  
+  }
 
   
 }
